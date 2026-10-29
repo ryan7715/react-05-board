@@ -1,48 +1,32 @@
-import { useEffect, useState } from "react";
+import { BrowserRouter, Route, Routes } from "react-router";
+import Home from "./routes/Home.jsx";
+import Detail from "./routes/Detail.jsx";
 
 function App() {
-    const [list, setList] = useState([]);
-    const [loading, setLoading] = useState(true); // 로딩 과정인지 아닌지를 boolean으로 만듬
-
-    useEffect(() => {
-        fetch("https://jsonplaceholder.typicode.com/posts")
-            .then(res => res.json())
-            .then(json => {
-                setList(json);
-                setLoading(false); // 데이터를 불러오는 작업이 끝난다는 의미로 loading을 false
-            })
-            .catch(err => console.log(err));
-    }, []);
-
-    if (loading) {
-        return <div>데이터를 로드 중입니다...</div>;
-    }
-
-    // useEffect를 통해서 최초 렌더링 이후에 useEffect 안의 함수를 실행하는데,
-    // 정상적으로 모든 작업이 끝났을 때 setLoading(false)를 통해 loading 값이 바뀌고
-    // state 값이 바뀌었으므로 그때 이 아래에 있는 return이 화면에 리렌더링 됨
     return (
-        <div>
-            <h1>커뮤니티 게시팜</h1>
-            <table border={1} cellPadding={10} style={{ borderCollapse: "collapse" }}>
-                <thead>
-                    <tr>
-                        <th>번호</th>
-                        <th>제목</th>
-                        <th>작성자 ID</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {list.map((item, index) => (
-                        <tr key={index}>
-                            <td>{item.id}</td>
-                            <td>{item.title}</td>
-                            <td>{item.userId}</td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-        </div>
+        <BrowserRouter>
+            {/*
+                App이 실행이 되면서, 최상단의 BrowserRouter가 실행됨에 따라
+                사용자가 요청한 경로가 React와 동기화됨
+             */}
+            <Routes>
+                {/* React가 읽어들인 "/" 경로에 따라 Routes는 저 쪽으로 가라고 지시함 */}
+                <Route path={"/"} element={<Home />} />
+                {/*
+                    경로가 /3, /8 /25 같은 첫번째 자리에 값이 들어올 경우
+                    Detail 컴포넌트를 화면에 띄워줘야 하는 상황
+                    => 첫번째 자리가 고정 값이 "/about" 이 아니라
+                       "/동적으로 변하는 값" 이 옴
+                */}
+                <Route path={"/:id"} element={<Detail />} />
+                {/*
+                    내가 원하는건 경로의 첫번째 자리에 어떤 값이든 들어오면,
+                    Detail이라는 컴포넌트를 화면에 띄워줄거야
+                    근데, 그렇게 하면서 그 들어온 값은 react-router
+                    니가 "id"라는 이름을 붙여서 갖고 있어줘
+                */}
+            </Routes>
+        </BrowserRouter>
     );
 }
 
